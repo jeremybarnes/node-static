@@ -99,8 +99,11 @@ function finishedTest(error, stdout, stderr)
 }
 
 // Spawn the testing process
-var ab = cp.exec("ab -n " + options.requests + " -c " + options.concurrency
-                 + " http://localhost:" + port + "/" + file,
-                 finishedTest);
+var ab = cp.spawn("ab", ['-n', options.requests, '-c', options.concurrency,
+                         "http://localhost:" + port + "/" + file]);
+
+ab.stdout.on('data', function(data) { process.stdout.write(data); });
+ab.stderr.on('data', function(data) { fs.writeSync(2, data, 0, data.length, null); });
+ab.on('exit', finishedTest);
 
 sys.puts("running test");
