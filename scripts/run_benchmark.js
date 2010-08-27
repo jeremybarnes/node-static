@@ -69,6 +69,7 @@ for (var i = 0;  i < filesize / 64;  ++i) {
 
 fs.close(fd);
 
+
 // Set up node-static
 var server = new st.Server(directory);
 
@@ -88,22 +89,30 @@ require('http').createServer(onRequest).listen(port);
 
 sys.puts("Listening on 127.0.0.1:" + options.port);
 
+
+
 function finishedTest(error, stdout, stderr)
 {
     sys.puts("finished test");
     stdout && sys.puts("stdout:", stdout);
     stderr && sys.puts("stderr:", stderr);
     error && sys.puts("error:", error.message, error.killed, error.code, error.signal);
+    error && sys.puts(sys.inspect(error));
+
 
     process.exit(1);
 }
 
-// Spawn the testing process
-var ab = cp.spawn("ab", ['-n', options.requests, '-c', options.concurrency,
-                         "http://localhost:" + port + "/" + file]);
+var runTest = true;
 
-ab.stdout.on('data', function(data) { process.stdout.write(data); });
-ab.stderr.on('data', function(data) { fs.writeSync(2, data, 0, data.length, null); });
-ab.on('exit', finishedTest);
+if (runTest) {
+    // Spawn the testing process
+    var ab = cp.spawn("ab", ['-n', options.requests, '-c', options.concurrency, '-r',
+                             "http://localhost:" + port + "/" + file]);
 
-sys.puts("running test");
+    ab.stdout.on('data', function(data) { process.stdout.write(data); });
+    ab.stderr.on('data', function(data) { fs.writeSync(2, data, 0, data.length, null); });
+    ab.on('exit', finishedTest);
+
+    sys.puts("running test");
+}

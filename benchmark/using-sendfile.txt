@@ -1,0 +1,127 @@
+100000 byte requests, 100 concurrent connections:
+
+Not using sendfile:
+
+scripts/run_benchmark.js -n 1000 -s 100000 -c 100
+
+Document Length:        100032 bytes
+
+Concurrency Level:      100
+Time taken for tests:   2.764 seconds
+Complete requests:      1000
+Failed requests:        0
+Write errors:           0
+Total transferred:      100297000 bytes
+HTML transferred:       100032000 bytes
+Requests per second:    361.78 [#/sec] (mean)
+Time per request:       276.409 [ms] (mean)
+Time per request:       2.764 [ms] (mean, across all concurrent requests)
+Transfer rate:          35435.22 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    1   2.8      0      11
+Processing:   250  275  23.2    267     349
+Waiting:       26   43  18.0     39     108
+Total:        250  276  23.6    268     349
+
+Percentage of the requests served within a certain time (ms)
+  50%    268
+  66%    271
+  75%    275
+  80%    276
+  90%    332
+  95%    339
+  98%    346
+  99%    347
+ 100%    349 (longest request)
+
+Using sendfile:
+
+Document Path:          /file.txt
+Document Length:        100297 bytes
+
+Concurrency Level:      100
+Time taken for tests:   0.673 seconds
+Complete requests:      1000
+Failed requests:        0
+Write errors:           0
+Total transferred:      100562000 bytes
+HTML transferred:       100297000 bytes
+Requests per second:    1485.00 [#/sec] (mean)
+Time per request:       67.340 [ms] (mean)
+Time per request:       0.673 [ms] (mean, across all concurrent requests)
+Transfer rate:          145834.47 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.7      0       3
+Processing:    16   65  10.3     67      88
+Waiting:       16   65  10.3     67      87
+Total:         19   65  10.1     67      90
+
+Percentage of the requests served within a certain time (ms)
+  50%     67
+  66%     70
+  75%     72
+  80%     72
+  90%     75
+  95%     76
+  98%     81
+  99%     86
+ 100%     90 (longest request)
+
+Clearly there are some bugs, but it's 4 times faster.
+
+-----------------------
+
+10000 bytes, 10000 requests, 100 concurrent
+
+Without Sendfile:
+
+Transfer rate:          14135.99 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   15 211.7      0    3002
+Processing:    27   56  19.0     65     100
+Waiting:       11   27  10.2     27      65
+Total:         27   71 213.4     65    3080
+
+
+With Sendfile:
+
+Transfer rate:          22006.86 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.2      0       3
+Processing:    19   47   8.1     45      73
+Waiting:       19   47   8.1     45      73
+Total:         20   47   8.1     45      76
+
+Transfer rate:          21161.71 [Kbytes/sec] received
+
+
+Asynchronous sendfile:
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.7      0      12
+Processing:    25   49   7.7     46      70
+Waiting:       11   25   5.8     24      49
+Total:         26   49   7.7     46      77
+
+
+And with 100000 bytes:
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.8      0       3
+Processing:    34   63   8.7     66      87
+Waiting:       15   33   6.7     30      59
+Total:         34   64   8.9     67      89
+
+
+And with 1000000 bytes:
+
